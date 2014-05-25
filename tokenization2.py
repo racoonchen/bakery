@@ -52,8 +52,5 @@ def tokenize(text):
 		for token in tokens:
 			all_tokens.append(token)
 	
-	#output = codecs.open('c:\\users\\dmitry\\textgen\\output_token.txt', u'w', encoding = 'utf-8')
-	#for t in all_tokens:
-	#	output.write(t + u'\n')
 	print u'Tokenization done.'
 	return all_tokens
