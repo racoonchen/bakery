@@ -6,12 +6,18 @@ split_token = [u' ', u'\t', u'/', u'\\']
 weg = [u' ', u'\n', u'\t', u'-', u'\r'] #'"', '(', ')', '.', ',', '?', '!'] 	# ? u'\xa0'
 punct = [u',', u':', u';', u'(', u')', u'-', u"'", u'"']
 split_sent = [u'.', u'!', u'?', u'\n']
+roman = [u'I', u'V', u'X', u'L', u'M']
 
 def strip_string(string):
 	if len(string)>1:
 		while len(string)>1 and (string[0] in weg or string[len(string)-1] in weg):
 			for item in weg: string = string.strip(item)
 	return string
+
+def is_number(token):
+	if token.isdigit(): return True 
+	elif token in roman: return True
+	else: return False
 	
 def tokenizer(s):
 	tokens = []
@@ -45,5 +51,9 @@ def tokenize(text):
 		tokens = tokenizer(line)
 		for token in tokens:
 			all_tokens.append(token)
+	
+	#output = codecs.open('c:\\users\\dmitry\\textgen\\output_token.txt', u'w', encoding = 'utf-8')
+	#for t in all_tokens:
+	#	output.write(t + u'\n')
 	print u'Tokenization done.'
 	return all_tokens

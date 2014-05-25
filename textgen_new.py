@@ -2,7 +2,7 @@
 import os, codecs, random, nltk
 from nltk.probability import LidstoneProbDist  
 from nltk.model import NgramModel  
-from tokenization2 import tokenize, strip_string
+from tokenization2 import tokenize, strip_string, is_number
 
 # подсчет гласных, определение положения ударения
 def count_vowels(s):
@@ -57,9 +57,10 @@ def ends_correctly(possible_line, last_even_vowel):
 	
 # запрет на несуществующие слова, на 2 одинаковых слова подряд, на 2 предлога\союза подряд				
 def is_allowed_word_combination(previous_word, next_word):
-	if next_word in forbidden_words: return False
+	if next_word.replace('<', '') in forbidden_words: return False
+	elif is_number(next_word.replace('<', '')): return False
 	elif previous_word == next_word: return False
-	elif previous_word in prepositions and next_word in prepositions: return False
+	elif previous_word.replace('<', '') in prepositions and next_word.replace('<', '') in prepositions: return False
 	else: return True
 	
 #генерируем строку, начинающуюся с word, с i слогов (т.е. i гласных) и возвращаем ее в виде списка слов
@@ -72,7 +73,6 @@ def generate_line(meisterwerk, i):
 	previous_word = meisterwerk[-1]
 	while vowels < i or final_preposition == True:
 		joined_line = "".join(w for w in line)
-		#print str(number_of_attempts)
 		
 		if number_of_attempts < 30:
 			next_word = model.choose_random_word(context = meisterwerk[-context_length:])
@@ -84,7 +84,7 @@ def generate_line(meisterwerk, i):
 		number_of_attempts += 1
 		number_of_v, stress_position = count_vowels(next_word)
 		if is_allowed_word_combination(previous_word, next_word) and vowels + number_of_v <= i and it_is_a_pretty_yamb(joined_line, stress_position, number_of_v):
-			if vowels+number_of_v < last_even_vowel or ends_correctly(joined_line+next_word, last_even_vowel):
+			if vowels+number_of_v < last_even_vowel or (ends_correctly(joined_line+next_word, last_even_vowel) and next_word.replace('<', '') not in prepositions):
 				line.append(next_word)
 				meisterwerk.append(next_word)
 				vowels = vowels+number_of_v
@@ -93,9 +93,10 @@ def generate_line(meisterwerk, i):
 				print u'Next word generated'
 
 		## слово не должно заканчиваться на предлог
-		if number_of_v == i:
-			if line[-1] in prepositions: 
-				final_preposition = True
+		#if number_of_v == i:
+		#	if line[-1].replace('<', '') in prepositions: 
+		#		final_preposition = True
+		#		print '--------------final preposition!'
 	return line
 
 # выполнение программы теперь в цикле, это ни на что не влияет, но так вроде бы принято :)
